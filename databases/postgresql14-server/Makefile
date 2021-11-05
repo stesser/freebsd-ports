@@ -76,7 +76,7 @@ GNU_CONFIGURE_PREFIX=	${PREFIX}/lib/${PORTNAME}${PG_SUFFIX}
 USE_RC_SUBR=	postgresql${PG_SUFFIX}
 USERS=		${PG_USER}
 GROUPS=		${PG_GROUP}
-SUB_FILES+=	502.pgsql
+SUB_FILES+=	502.postgresql
 .endif
 
 OPTIONS_SUB=	yes
@@ -339,8 +339,8 @@ do-install:
 	done
 .  if defined(SERVER_ONLY)
 	${MKDIR} ${STAGEDIR}${PREFIX}/etc/periodic/daily ;\
-	${INSTALL_SCRIPT} ${WRKDIR}/502.pgsql \
-			${STAGEDIR}${PREFIX}/etc/periodic/daily/502.pgsql${PG_SUFFIX}
+	${INSTALL_SCRIPT} ${WRKDIR}/502.postgresql \
+			${STAGEDIR}${PREFIX}/etc/periodic/daily/502.postgresql${PG_SUFFIX}
 	for f in ${STAGEDIR}${GNU_CONFIGURE_PREFIX}/bin/*; do \
 		${MV} $$f ${STAGEDIR}${PREFIX}/bin/$${f##*/}${PG_SUFFIX}; \
 	done

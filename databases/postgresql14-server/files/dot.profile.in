@@ -5,7 +5,7 @@ PGDATA=${HOME}/data96
 
 export PATH PGLIB PGDATA
 
-# if you use the periodic script from share/postgresql/502.pgsql, you
+# if you use the periodic script from share/postgresql/502.postgresql%%PG_SUFFIX%%, you
 # can set these
 #PGDUMP_ARGS="-b -F c"
 #PGBACKUPDIR=${HOME}/backups

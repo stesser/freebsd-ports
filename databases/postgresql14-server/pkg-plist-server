@@ -14,7 +14,7 @@ bin/pg_upgrade%%PG_SUFFIX%%
 bin/pg_waldump%%PG_SUFFIX%%
 bin/postgres%%PG_SUFFIX%%
 bin/postmaster%%PG_SUFFIX%%
-etc/periodic/daily/502.pgsql%%PG_SUFFIX%%
+etc/periodic/daily/502.postgresql%%PG_SUFFIX%%
 %%PG_INCDIR%%/server/plpgsql.h
 %%PG_LIBDIR%%/libpgcommon.a
 %%PG_LIBDIR%%/libpgcommon_shlib.a
