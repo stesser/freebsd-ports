@@ -57,13 +57,13 @@ pgsql_backup() {
 	now=`date "+%Y-%m-%dT%H:%M:%S"`
 	file=${daily_pgsql_backupdir}/pgglobals_${now}
 	su -l ${daily_pgsql_user} -c \
-		"umask 077; pg_dumpall-%%PG_VERS%% -g ${daily_pgsql_pgdumpall_globals_args} | gzip -9 > ${file}.gz"
+		"umask 077; pg_dumpall-%%PG_SUFFIX%% -g ${daily_pgsql_pgdumpall_globals_args} | gzip -9 > ${file}.gz"
 
 	db=$1
 	while shift; do
 	    echo -n " $db"
 	    file=${backupdir}/pgdump_${db}_${now}
-	    su -l ${daily_pgsql_user} -c "umask 077; pg_dump-%%PG_VERS%% ${daily_pgsql_pgdump_args} -f ${file} ${db}"
+	    su -l ${daily_pgsql_user} -c "umask 077; pg_dump-%%PG_SUFFIX%% ${daily_pgsql_pgdump_args} -f ${file} ${db}"
 	    [ $? -gt 0 ] && rc=3
 		db=$1
 	done
@@ -101,7 +101,7 @@ case "$daily_pgsql_vacuum_enable" in
 
 	echo
 	echo "PostgreSQL vacuum"
-	su -l ${daily_pgsql_user} -c "vacuumdb-%%PG_VERS%% ${daily_pgsql_vacuum_args}"
+	su -l ${daily_pgsql_user} -c "vacuumdb-%%PG_SUFFIX%% ${daily_pgsql_vacuum_args}"
 	if [ $? -gt 0 ]
 	then
 	    echo

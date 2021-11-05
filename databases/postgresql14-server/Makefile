@@ -29,7 +29,7 @@ PKGINSTALL?=	${PKGDIR}/pkg-install${COMPONENT}
 USES+=		tar:bzip2 cpe
 .if !defined(NO_BUILD)
 USES+=		gmake
-PG_VERS=	${PORTVERSION:R}
+PG_SUFFIX=	${PORTVERSION:R}
 GNU_CONFIGURE=	yes
 .endif
 
@@ -72,8 +72,8 @@ COMPONENT=	-server
 DATADIR=	${GNU_CONFIGURE_PREFIX}/share
 DOCSDIR=	${GNU_CONFIGURE_PREFIX}/share/doc
 USES+=		pgsql:${DISTVERSION:C/([0-9]\.?[0-9]).*/\1/g}
-GNU_CONFIGURE_PREFIX=	${PREFIX}/lib/${PORTNAME}${PG_VERS}
-USE_RC_SUBR=	postgresql${PG_VERS}
+GNU_CONFIGURE_PREFIX=	${PREFIX}/lib/${PORTNAME}${PG_SUFFIX}
+USE_RC_SUBR=	postgresql${PG_SUFFIX}
 USERS=		${PG_USER}
 GROUPS=		${PG_GROUP}
 SUB_FILES+=	502.pgsql
@@ -189,14 +189,14 @@ PLIST_SUB+=		PG_USER=${PG_USER} \
 			PG_USER_regex=[[:<:]]${PG_USER}[[:>:]] \
 			PG_GROUP=${PG_GROUP} \
 			PG_GROUP_regex=[[:<:]]${PG_GROUP}[[:>:]] \
-			PG_VERS=${PG_VERS} \
-			PG_INCDIR=lib/${PORTNAME}${PG_VERS}/include \
-			PG_LIBDIR=lib/${PORTNAME}${PG_VERS}/lib\
+			PG_SUFFIX=${PG_SUFFIX} \
+			PG_INCDIR=lib/${PORTNAME}${PG_SUFFIX}/include \
+			PG_LIBDIR=lib/${PORTNAME}${PG_SUFFIX}/lib\
 			PG_BINDIR=bin
 SUB_LIST+=		PG_GROUP=${PG_GROUP} \
 			PG_USER=${PG_USER} \
 			PG_UID=${PG_UID} \
-			PG_VERS=${PG_VERS} \
+			PG_SUFFIX=${PG_SUFFIX} \
 			PG_PREFIX=${GNU_CONFIGURE_PREFIX}
 
 .include <bsd.port.options.mk>
@@ -340,11 +340,11 @@ do-install:
 .  if defined(SERVER_ONLY)
 	${MKDIR} ${STAGEDIR}${PREFIX}/etc/periodic/daily ;\
 	${INSTALL_SCRIPT} ${WRKDIR}/502.pgsql \
-			${STAGEDIR}${PREFIX}/etc/periodic/daily/502.pgsql${PG_VERS}
+			${STAGEDIR}${PREFIX}/etc/periodic/daily/502.pgsql${PG_SUFFIX}
 	for f in ${STAGEDIR}${GNU_CONFIGURE_PREFIX}/bin/*; do \
-		${MV} $$f ${STAGEDIR}${PREFIX}/bin/$${f##*/}${PG_VERS}; \
+		${MV} $$f ${STAGEDIR}${PREFIX}/bin/$${f##*/}${PG_SUFFIX}; \
 	done
-	${LN} -sf postgres${PG_VERS} ${STAGEDIR}${PREFIX}/bin/postmaster${PG_VERS}
+	${LN} -sf postgres${PG_SUFFIX} ${STAGEDIR}${PREFIX}/bin/postmaster${PG_SUFFIX}
 	${RMDIR} ${STAGEDIR}${GNU_CONFIGURE_PREFIX}/bin
 .  endif # SERVER_ONLY
 .  if defined(CLIENT_ONLY)
