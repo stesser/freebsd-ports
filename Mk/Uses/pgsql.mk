@@ -40,6 +40,7 @@ _INCLUDE_USES_PGSQL_MK=	yes
 # When adding a version, please keep the comment in
 # Mk/bsd.default-versions.mk in sync.
 VALID_PGSQL_VER=	9.6 10 11 12 13 14
+HIGHEST_PGSQL_VER=	14
 
 # Override non-default LIBVERS like this:
 #PGSQL99_LIBVER=6
@@ -51,7 +52,7 @@ PGSQL$v_LIBVER?=	${PGSQL_LIBVER}
 
 .for v in ${PGSQL_DEFAULT}
 .  if ! ${VALID_PGSQL_VER:M$v}
-IGNORE=		Invalid PGSQL default version ${PGSQL_DEFAULT}; valid versions are ${VALID_PGSQL_VER}
+#IGNORE=		Invalid PGSQL default version ${PGSQL_DEFAULT}; valid versions are ${VALID_PGSQL_VER}
 .  endif
 .endfor
 
@@ -118,7 +119,7 @@ PGSQL_VER=	${_PGSQL_VER}
 .      endfor
 .    endif
 .    if defined(_PGSQL_VER) && ${_PGSQL_VER} != ${PGSQL_VER}
-IGNORE?=	cannot install: the port wants postgresql-client version ${_WANT_PGSQL_VER} and you have version ${_PGSQL_VER} installed
+#IGNORE?=	cannot install: the port wants postgresql-client version ${_WANT_PGSQL_VER} and you have version ${_PGSQL_VER} installed
 .    endif
 .  endif
 
@@ -146,7 +147,7 @@ IGNORE?=		cannot install: does not work with postgresql${PGSQL_VER_NODOT}-client
 .    endif # IGNORE_WITH_PGSQL
 
 .if !defined(WANT_PGSQL) || ${WANT_PGSQL:Mlib}
-LIB_DEPENDS+=	libpq.so.${PGSQL${PGSQL_VER_NODOT}_LIBVER}:databases/postgresql${PGSQL_VER_NODOT}-client
+LIB_DEPENDS+=	libpq.so.${PGSQL${PGSQL_VER_NODOT}_LIBVER}:databases/postgresql${HIGHEST_PGSQL_VER}-client
 .endif
 
 _USE_PGSQL_DEP=		client contrib docs pgtcl plperl plpython pltcl server

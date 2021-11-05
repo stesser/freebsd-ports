@@ -1,0 +1,115 @@
+#!/bin/sh
+
+# PROVIDE: postgresql
+# REQUIRE: DAEMON
+# KEYWORD: shutdown
+#
+# Add the following line to /etc/rc.conf to enable PostgreSQL:
+#
+#  postgresql%%PG_VERS%%_enable="YES"
+#  # optional
+#  postgresql%%PG_VERS%%_data="/var/db/%%PG_USER%%/data14"
+#  postgresql%%PG_VERS%%_flags="-w -s -m fast"
+#  postgresql%%PG_VERS%%_initdb_flags="--encoding=utf-8 --lc-collate=C"
+#  postgresql%%PG_VERS%%_login_class="default"
+#  postgresql%%PG_VERS%%_profiles=""
+#
+# See %%PG_PREFIX%%/share/doc/README-server for more info
+#
+# This scripts takes one of the following commands:
+#
+#   start stop restart reload status initdb
+#
+# For postmaster startup options, edit ${postgresql%%PG_VERS%%_data}/postgresql.conf
+
+command=%%PREFIX%%/bin/pg_ctl%%PG_VERS%%
+
+. /etc/rc.subr
+
+load_rc_config postgresql%%PG_VERS%%
+
+# set defaults
+postgresql%%PG_VERS%%_enable=${postgresql%%PG_VERS%%_enable:-"NO"}
+postgresql%%PG_VERS%%_flags=${postgresql%%PG_VERS%%_flags:-"-w -s -m fast"}
+postgresql%%PG_VERS%%_user=${postgresql%%PG_VERS%%_user:-"%%PG_USER%%"}
+eval postgresql%%PG_VERS%%_data=${postgresql%%PG_VERS%%_data:-"~${postgresql_user}/data14"}
+postgresql%%PG_VERS%%_login_class=${postgresql%%PG_VERS%%_login_class:-"default"}
+postgresql%%PG_VERS%%_initdb_flags=${postgresql%%PG_VERS%%_initdb_flags:-"--encoding=utf-8 --lc-collate=C"}
+
+name=postgresql%%PG_VERS%%
+rcvar=postgresql_enable%%PG_VERS%%
+extra_commands="reload initdb%%PG_VERS%%"
+
+start_cmd="postgresql_command start"
+stop_cmd="postgresql_command stop"
+restart_cmd="postgresql_command restart"
+reload_cmd="postgresql_command reload"
+status_cmd="postgresql_command status"
+promote_cmd="postgresql_command promote"
+
+initdb_cmd="postgresql_initdb%%PG_VERS%%"
+
+su_cmd="/usr/bin/su"
+
+if [ -n "$2" ]; then
+	profile="$2"
+	if [ "x${postgresql_profiles}" != "x" ]; then
+		eval postgresql%%PG_VERS%%_data="\${postgresql%%PG_VERS%%_${profile}_data:-}"
+		if [ "x${postgresql_data%%PG_VERS%%}" = "x" ]; then
+			echo "You must define a data directory (postgresql%%PG_VERS%%_${profile}_data)"
+			exit 1
+		fi
+		eval postgresql%%PG_VERS%%_enable="\${postgresql%%PG_VERS%%_${profile}_enable:-${postgresql%%PG_VERS%%_enable}}"
+		eval postgresql%%PG_VERS%%_data="\${postgresql%%PG_VERS%%_${profile}_data:-${postgresql%%PG_VERS%%_data}}"
+		eval postgresql%%PG_VERS%%_flags="\${postgresql%%PG_VERS%%_${profile}_flags:-${postgresql%%PG_VERS%%_flags}}"
+		eval postgresql%%PG_VERS%%_initdb_flags="\${postgresql%%PG_VERS%%_${profile}_initdb_flags:-${postgresql%%PG_VERS%%_initdb_flags}}"
+	fi
+else
+	if [ "x${postgresql%%PG_VERS%%_profiles}" != "x" -a "x$1" != "x" ]; then
+		for profile in ${postgresql%%PG_VERS%%_profiles}; do
+			eval _enable="\${postgresql%%PG_VERS%%_${profile}_enable}"
+			case "x${_enable:-${postgresql%%PG_VERS%%_enable}}" in
+			x|x[Nn][Oo]|x[Nn][Oo][Nn][Ee])
+				continue
+				;;
+			x[Yy][Ee][Ss])
+				;;
+			*)
+				if test -z "$_enable"; then
+					_var=postgresql%%PG_VERS%%_enable
+				else
+					_var=postgresql%%PG_VERS%%_"${profile}"_enable
+				fi
+				echo "Bad value" \
+					"'${_enable:-${postgresql%%PG_VERS%%_enable}}'" \
+					"for ${_var}. " \
+					"Profile ${profile} skipped."
+				continue
+				;;
+			esac
+			echo "===> postgresql%%PG_VERS%% profile: ${profile}"
+			%%PREFIX%%/etc/rc.d/postgresql%%PG_VERS%% $1 ${profile}
+			retcode="$?"
+			if [ "0${retcode}" -ne 0 ]; then
+				failed="${profile} (${retcode}) ${failed:-}"
+			else
+				success="${profile} ${success:-}"
+			fi
+		done
+		exit 0
+	fi
+fi
+
+command_args="-D ${postgresql%%PG_VERS%%_data} ${postgresql%%PG_VERS%%_flags}"
+
+postgresql_command()
+{
+    ${su_cmd} -l ${postgresql%%PG_VERS%%_user} -c "exec ${command} ${command_args} ${rc_arg}"
+}
+
+postgresql_initdb()
+{
+    ${su_cmd} -l -c ${postgresql%%PG_VERS%%_login_class} ${postgresql%%PG_VERS%%_user} -c "exec %%PREFIX%%/bin/initdb ${postgresql%%PG_VERS%%_initdb_flags} -D ${postgresql%%PG_VERS%%_data} -U ${postgresql%%PG_VERS%%_user}"
+}
+
+run_rc_command "$1"

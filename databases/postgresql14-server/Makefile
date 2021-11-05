@@ -29,6 +29,7 @@ PKGINSTALL?=	${PKGDIR}/pkg-install${COMPONENT}
 USES+=		tar:bzip2 cpe
 .if !defined(NO_BUILD)
 USES+=		gmake
+PG_VERS=	${PORTVERSION:R}
 GNU_CONFIGURE=	yes
 .endif
 
@@ -40,6 +41,7 @@ LDFLAGS+=	-L${LOCALBASE}/lib
 INCLUDES+=	-I${LOCALBASE}/include
 CONFIGURE_ARGS+=--with-libraries=${PREFIX}/lib \
 		--with-includes=${PREFIX}/include \
+		--localedir=${PREFIX}/share/locale \
 		--enable-thread-safety
 CONFIGURE_ENV+=	INCLUDES="${INCLUDES}" \
 		PTHREAD_LIBS="-lpthread" \
@@ -67,10 +69,13 @@ INSTALL_TARGET?=install-strip
 .if !defined(CLIENT_ONLY) && !defined(SLAVE_ONLY)
 SERVER_ONLY=	yes
 COMPONENT=	-server
-USE_RC_SUBR=	postgresql
+DATADIR=	${GNU_CONFIGURE_PREFIX}/share
+DOCSDIR=	${GNU_CONFIGURE_PREFIX}/share/doc
 USES+=		pgsql:${DISTVERSION:C/([0-9]\.?[0-9]).*/\1/g}
+GNU_CONFIGURE_PREFIX=	${PREFIX}/lib/${PORTNAME}${PG_VERS}
+USE_RC_SUBR=	postgresql${PG_VERS}
 USERS=		${PG_USER}
-GROUPS=	${PG_GROUP}
+GROUPS=		${PG_GROUP}
 SUB_FILES+=	502.pgsql
 .endif
 
@@ -108,6 +113,8 @@ OPTIONS_DEFAULT+=	LLVM
 LLVM_DESC=		Build with support for JIT-compiling expressions
 OPTIONS_EXCLUDE+=	${OPTIONS_EXCLUDE_${ARCH}_${OSREL:R}}
 OPTIONS_EXCLUDE_powerpc64_12=	LLVM
+USES+=			gnome
+USE_GNOME+=		libxml2
 .endif
 
 .if ${DISTVERSION:C/([0-9]*).*/\1/} < 10
@@ -181,10 +188,16 @@ DEBUG_CONFIGURE_ENABLE=	debug
 PLIST_SUB+=		PG_USER=${PG_USER} \
 			PG_USER_regex=[[:<:]]${PG_USER}[[:>:]] \
 			PG_GROUP=${PG_GROUP} \
-			PG_GROUP_regex=[[:<:]]${PG_GROUP}[[:>:]]
+			PG_GROUP_regex=[[:<:]]${PG_GROUP}[[:>:]] \
+			PG_VERS=${PG_VERS} \
+			PG_INCDIR=lib/${PORTNAME}${PG_VERS}/include \
+			PG_LIBDIR=lib/${PORTNAME}${PG_VERS}/lib\
+			PG_BINDIR=bin
 SUB_LIST+=		PG_GROUP=${PG_GROUP} \
 			PG_USER=${PG_USER} \
-			PG_UID=${PG_UID}
+			PG_UID=${PG_UID} \
+			PG_VERS=${PG_VERS} \
+			PG_PREFIX=${GNU_CONFIGURE_PREFIX}
 
 .include <bsd.port.options.mk>
 
@@ -325,10 +338,14 @@ do-install:
 		${SETENV} ${MAKE_ENV} ${MAKE_CMD} ${MAKE_ARGS} ${INSTALL_TARGET}; \
 	done
 .  if defined(SERVER_ONLY)
-	@ ${MKDIR} ${STAGEDIR}${PREFIX}/share/postgresql ;\
 	${MKDIR} ${STAGEDIR}${PREFIX}/etc/periodic/daily ;\
 	${INSTALL_SCRIPT} ${WRKDIR}/502.pgsql \
-			${STAGEDIR}${PREFIX}/etc/periodic/daily
+			${STAGEDIR}${PREFIX}/etc/periodic/daily/502.pgsql${PG_VERS}
+	for f in ${STAGEDIR}${GNU_CONFIGURE_PREFIX}/bin/*; do \
+		${MV} $$f ${STAGEDIR}${PREFIX}/bin/$${f##*/}${PG_VERS}; \
+	done
+	${LN} -sf postgres${PG_VERS} ${STAGEDIR}${PREFIX}/bin/postmaster${PG_VERS}
+	${RMDIR} ${STAGEDIR}${GNU_CONFIGURE_PREFIX}/bin
 .  endif # SERVER_ONLY
 .  if defined(CLIENT_ONLY)
 	@ cd ${WRKSRC}/src && ${SETENV} ${MAKE_ENV} ${MAKE_CMD} ${MAKE_ARGS} install-local

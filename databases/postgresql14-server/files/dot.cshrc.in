@@ -1,4 +1,4 @@
-setenv PGLIB %%PREFIX%%/lib
+setenv PGLIB %%PG_PREFIX%%/lib
 
 # note: PGDATA can be overridden by the -D startup option
 setenv PGDATA $HOME/data96

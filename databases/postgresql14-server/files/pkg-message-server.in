@@ -21,8 +21,8 @@ consider running the SQL script %%PREFIX%%/share/postgresql/odbc.sql
 to get the functions required for ODBC compliance.
 
 Please note that if you use the rc script,
-%%PREFIX%%/etc/rc.d/postgresql, to initialize the database, unicode
-(UTF-8) will be used to store character data by default.  Set
+%%PREFIX%%/etc/rc.d/postgresql%%PG_VERS%%, to initialize the database,
+unicode (UTF-8) will be used to store character data by default.  Set
 postgresql_initdb_flags or use login.conf settings described below to
 alter this behaviour. See the start rc script for more info.
 
@@ -42,11 +42,11 @@ Then add 'postgresql_class="postgres"' to /etc/rc.conf.
 
 To initialize the database, run
 
-  %%PREFIX%%/etc/rc.d/postgresql initdb
+  %%PREFIX%%/etc/rc.d/postgresql%%PG_VERS%% initdb
 
 You can then start PostgreSQL by running:
 
-  %%PREFIX%%/etc/rc.d/postgresql start
+  %%PREFIX%%/etc/rc.d/postgresql%%PG_VERS%% start
 
 For postmaster settings, see ~postgres/data/postgresql.conf
 
@@ -63,7 +63,7 @@ NB. If you're not using a checksumming filesystem like ZFS, you might
 ======================================================================
 
 To run PostgreSQL at startup, add
-'postgresql_enable="YES"' to /etc/rc.conf
+'postgresql%%PG_VERS%%_enable="YES"' to /etc/rc.conf
 EOM
 }
 ]
