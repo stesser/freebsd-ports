@@ -1,0 +1,7 @@
+libpgcommon är tydligen delvis för client (två av dem) och en för server
+installera manuellt verkar rimligt? tyvärr...
+
+
+annars, enkelt att bara låta client vara i stort sett som den är. förutom
+möjligen då include-filerna... hmmm... och någon annan justering. i övrigt
+borde det räcka långt att serverbitarna delas upp per version.

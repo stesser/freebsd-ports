@@ -1,0 +1,115 @@
+#!/bin/sh
+
+# PROVIDE: postgresql%%PG_SUFFIX%%
+# REQUIRE: DAEMON
+# KEYWORD: shutdown
+#
+# Add the following line to /etc/rc.conf to enable PostgreSQL:
+#
+#  postgresql%%PG_SUFFIX%%_enable="YES"
+#  # optional
+#  postgresql%%PG_SUFFIX%%_data="/var/db/%%PG_USER%%/data%%PG_SUFFIX%%"
+#  postgresql%%PG_SUFFIX%%_flags="-w -s -m fast"
+#  postgresql%%PG_SUFFIX%%_initdb_flags="--encoding=utf-8 --lc-collate=C"
+#  postgresql%%PG_SUFFIX%%_login_class="default"
+#  postgresql%%PG_SUFFIX%%_profiles=""
+#
+# See %%PREFIX%%/share/doc/postgresql%%PG_SUFFIX%%/README-server for more info
+#
+# This scripts takes one of the following commands:
+#
+#   start stop restart reload status initdb
+#
+# For postmaster startup options, edit ${postgresql%%PG_SUFFIX%%_data}/postgresql.conf
+
+command=%%PREFIX%%/libexec/postgresql%%PG_SUFFIX%%/pg_ctl
+
+. /etc/rc.subr
+
+load_rc_config postgresql%%PG_SUFFIX%%
+
+# set defaults
+postgresql%%PG_SUFFIX%%_enable=${postgresql%%PG_SUFFIX%%_enable:-"NO"}
+postgresql%%PG_SUFFIX%%_flags=${postgresql%%PG_SUFFIX%%_flags:-"-w -s -m fast"}
+postgresql%%PG_SUFFIX%%_user=${postgresql%%PG_SUFFIX%%_user:-"%%PG_USER%%"}
+eval postgresql%%PG_SUFFIX%%_data=${postgresql%%PG_SUFFIX%%_data:-"~${postgresql%%PG_SUFFIX%%_user}/data%%PG_SUFFIX%%"}
+postgresql%%PG_SUFFIX%%_login_class=${postgresql%%PG_SUFFIX%%_login_class:-"default"}
+postgresql%%PG_SUFFIX%%_initdb_flags=${postgresql%%PG_SUFFIX%%_initdb_flags:-"--encoding=utf-8 --lc-collate=C"}
+
+name=postgresql%%PG_SUFFIX%%
+rcvar=${name}_enable
+extra_commands="reload initdb"
+
+start_cmd="${name}_command start"
+stop_cmd="${name}_command stop"
+restart_cmd="${name}_command restart"
+reload_cmd="${name}_command reload"
+status_cmd="${name}_command status"
+promote_cmd="${name}_command promote"
+
+initdb_cmd="${name}_initdb"
+
+su_cmd="/usr/bin/su"
+
+if [ -n "$2" ]; then
+	profile="$2"
+	if [ "x${postgresql%%PG_SUFFIX%%_profiles}" != "x" ]; then
+		eval ${name}_data="\${${name}_${profile}_data:-}"
+		if [ "x${postgresql%%PG_SUFFIX%%_data}" = "x" ]; then
+			echo "You must define a data directory (${name}_${profile}_data)"
+			exit 1
+		fi
+		eval ${name}_enable="\${${name}_${profile}_enable:-\${${name}_enable}}"
+		eval ${name}_data="\${${name}_${profile}_data:-\${${name}_data}}"
+		eval ${name}_flags="\${${name}_${profile}_flags:-\${${name}_flags}}"
+		eval ${name}_initdb_flags="\${${name}_${profile}_initdb_flags:-\${${name}_initdb_flags}}"
+	fi
+else
+	if [ "x${postgresql%%PG_SUFFIX%%_profiles}" != "x" -a "x$1" != "x" ]; then
+		for profile in ${postgresql%%PG_SUFFIX%%_profiles}; do
+			eval _enable="\${${name}_${profile}_enable}"
+			case "x${_enable:-${postgresql%%PG_SUFFIX%%_enable}}" in
+			x|x[Nn][Oo]|x[Nn][Oo][Nn][Ee])
+				continue
+				;;
+			x[Yy][Ee][Ss])
+				;;
+			*)
+				if test -z "$_enable"; then
+					_var=${name}_enable
+				else
+					_var=${name}_"${profile}"_enable
+				fi
+				echo "Bad value" \
+					"'${_enable:-${postgresql%%PG_SUFFIX%%_enable}}'" \
+					"for ${_var}. " \
+					"Profile ${profile} skipped."
+				continue
+				;;
+			esac
+			echo "===> ${name} profile: ${profile}"
+			%%PREFIX%%/etc/rc.d/${name} $1 ${profile}
+			retcode="$?"
+			if [ "0${retcode}" -ne 0 ]; then
+				failed="${profile} (${retcode}) ${failed:-}"
+			else
+				success="${profile} ${success:-}"
+			fi
+		done
+		exit 0
+	fi
+fi
+
+command_args="-D ${postgresql%%PG_SUFFIX%%_data} ${postgresql%%PG_SUFFIX%%_flags}"
+
+postgresql%%PG_SUFFIX%%_command()
+{
+    ${su_cmd} -l ${postgresql%%PG_SUFFIX%%_user} -c "exec ${command} ${command_args} ${rc_arg}"
+}
+
+postgresql%%PG_SUFFIX%%_initdb()
+{
+    ${su_cmd} -l -c ${postgresql%%PG_SUFFIX%%_login_class} ${postgresql%%PG_SUFFIX%%_user} -c "exec %%PREFIX%%/libexec/${name}/initdb ${postgresql%%PG_SUFFIX%%_initdb_flags} -D ${postgresql%%PG_SUFFIX%%_data} -U ${postgresql%%PG_SUFFIX%%_user}"
+}
+
+run_rc_command "$1"

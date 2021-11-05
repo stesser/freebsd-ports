@@ -1,20 +1,27 @@
 # Provide support for PostgreSQL (pgsql)
 #
 # Feature:	pgsql
-# Usage:	USES=		pgsql[:version]
+# Usage:	USES=	pgsql[:server|contrib|plperl|pltcl|plpython,...]
 #
-# version 	Maintainer can set versions required. You can set this to
-#		[min]-[max] or min+ or -max or as an explicit version
-#		(eg. 9.3-9.6 for [min]-[max], 9.5+ or 9.6-
-#		for min+ and max-, 9.4 for an explicit version). Example:
+# 		Most ports require only connectivity to a postgresql database
+# 		cluster. These ports must not depends on the server component,
+# 		since the server might run on a different machine. Depend on
+# 		`pgsql' when the port links with libpq or uses psql or similar
+# 		tools to connect to a postgresql database.
 #
-#		    USES=pgsql:9.4		# Only use PostgreSQL 9.4
-#		    USES=pgsql:9.3+		# Use PostgreSQL 9.3 or newer
-#		    USES=pgsql:9.3-9.6	# Use PostgreSQL between 9.3 & 9.6
-#		    USES=pgsql:9.6-		# Use any PostgreSQL up to 9.6
-#		    USES=pgsql		# Use the default PostgreSQL
+# version:	When the port depends on a server component to build and run,
+# 		the maintainer can set versions required.  You can set this to
+# 		[min]-[max] or min+ or -max or as an explicit version
+# 		(eg. 9.6-11 for [min]-[max], 9.6+ or 12- for min+ and max-,
+# 		13 for an explicit version). Example:
 #
-#		WANT_PGSQL=	server[:fetch] plperl plpython pltcl
+#		    USES=pgsql		# a client app depending on libpq or psql
+#		    USES=pgsql:server:13	# Only use PostgreSQL 13
+#		    USES=pgsql:server:9.6	# Use PostgreSQL 9.6 or newer
+#		    USES=pgsql:server:11-13	# Use PostgreSQL between 11 & 13
+#		    USES=pgsql:contrib:11-	# Use any PostgreSQL server up to 11 and
+#		    				# and also require the contrib component
+#
 #
 #		Add PostgreSQL component dependency, using
 #		WANT_PGSQL=	component[:target].
@@ -55,22 +62,22 @@ IGNORE=		Invalid PGSQL default version ${PGSQL_DEFAULT}; valid versions are ${VA
 .  endif
 .endfor
 
-.  for w in WITH DEFAULT
-.    ifdef $w_PGSQL_VER
-WARNING+=	"$w_PGSQL_VER is defined, consider using DEFAULT_VERSIONS=pgsql=${$w_PGSQL_VER:C,^.,&.,} instead"
-PGSQL_DEFAULT?=	${$w_PGSQL_VER:C,^.,&.,}
-.    endif
-.  endfor
+#.  for w in WITH DEFAULT
+#.    ifdef $w_PGSQL_VER
+#WARNING+=	"$w_PGSQL_VER is defined, consider using DEFAULT_VERSIONS=pgsql=${$w_PGSQL_VER:C,^.,&.,} instead"
+#PGSQL_DEFAULT?=	${$w_PGSQL_VER:C,^.,&.,}
+#.    endif
+#.  endfor
 
-.  ifdef DEFAULT_PGSQL_VER && WITH_PGSQL_VER
-IGNORE=		will not allow setting both DEFAULT_PGSQL_VER and WITH_PGSQL_VER.  Use DEFAULT_VERSIONS=pgsql=9.6 instead
-.  endif
+#.  ifdef DEFAULT_PGSQL_VER && WITH_PGSQL_VER
+#IGNORE=		will not allow setting both DEFAULT_PGSQL_VER and WITH_PGSQL_VER.  Use DEFAULT_VERSIONS=pgsql=9.6 instead
+#.  endif
 
 # Setting/finding PostgreSQL version we want.
-PG_CONFIG?=	${LOCALBASE}/bin/pg_config
-.  if exists(${PG_CONFIG})
-_PGSQL_VER!=	${PG_CONFIG} --version | ${SED} -n 's/PostgreSQL[^0-9]*\([0-9]\.*[0-9]\).*/\1/p'
-.  endif
+#PG_CONFIG?=	${LOCALBASE}/bin/pg_config
+#.  if exists(${PG_CONFIG})
+#_PGSQL_VER!=	${PG_CONFIG} --version | ${SED} -n 's/PostgreSQL[^0-9]*\([0-9]\.*[0-9]\).*/\1/p'
+#.  endif
 
 # Handle the + and - version stuff
 .  if !empty(pgsql_ARGS)
@@ -118,7 +125,7 @@ PGSQL_VER=	${_PGSQL_VER}
 .      endfor
 .    endif
 .    if defined(_PGSQL_VER) && ${_PGSQL_VER} != ${PGSQL_VER}
-IGNORE?=	cannot install: the port wants postgresql-client version ${_WANT_PGSQL_VER} and you have version ${_PGSQL_VER} installed
+#IGNORE?=	cannot install: the port wants postgresql-client version ${_WANT_PGSQL_VER} and you have version ${_PGSQL_VER} installed
 .    endif
 .  endif
 
@@ -145,19 +152,16 @@ IGNORE?=		cannot install: does not work with postgresql${PGSQL_VER_NODOT}-client
 .	endfor
 .    endif # IGNORE_WITH_PGSQL
 
-.if !defined(WANT_PGSQL) || ${WANT_PGSQL:Mlib}
-LIB_DEPENDS+=	libpq.so.${PGSQL${PGSQL_VER_NODOT}_LIBVER}:databases/postgresql${PGSQL_VER_NODOT}-client
+.if !defined(WANT_PGSQL) || ${WANT_PGSQL:Mlib} || ${WANT_PGSQL:Mclient}
+LIB_DEPENDS+=	libpq.so.${PGSQL${PGSQL_VER_NODOT}_LIBVER}:databases/postgresql-client
 .endif
 
-_USE_PGSQL_DEP=		client contrib docs pgtcl plperl plpython pltcl server
-_USE_PGSQL_DEP_client=	psql
+_USE_PGSQL_DEP=		contrib plperl plpython pltcl server
 _USE_PGSQL_DEP_contrib=	vacuumlo
-_USE_PGSQL_DEP_docs=	postgresql${PGSQL_VER_NODOT}-docs>0
-_USE_PGSQL_DEP_pgtcl=	${LOCALBASE}/lib/pgtcl/pkgIndex.tcl
 _USE_PGSQL_DEP_plperl=	postgresql${PGSQL_VER_NODOT}-plperl>0
 _USE_PGSQL_DEP_plpython=postgresql${PGSQL_VER_NODOT}-plpython>0
 _USE_PGSQL_DEP_pltcl=	postgresql${PGSQL_VER_NODOT}-pltcl>0
-_USE_PGSQL_DEP_server=	postgres
+_USE_PGSQL_DEP_server=	${LOCALBASE}/libexec/postgresql${PGSQL_VER_NODOT}/postgres
 .    if defined(WANT_PGSQL)
 .      for depend in ${_USE_PGSQL_DEP}
 .        if ${WANT_PGSQL:M${depend}}

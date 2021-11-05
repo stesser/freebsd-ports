@@ -14,10 +14,12 @@ COMMENT?=	PostgreSQL is the most advanced open-source database available anywher
 
 LICENSE=	PostgreSQL
 
+.if defined(CLIENT_ONLY)
 .if ${DISTVERSION:C/([0-9]*).*/\1/} >= 10
 CONFLICTS+=	${PORTNAME}9* ${PORTNAME}1[^${PORTVERSION:R:C/.*([0-9]$)/\\1/}]*
 .else
 CONFLICTS+=	${PORTNAME}9[^${PORTVERSION:R:E}]* ${PORTNAME}1[0-9]*
+.endif
 .endif
 
 WRKSRC=		${WRKDIR}/postgresql-${DISTVERSION}
@@ -36,11 +38,21 @@ PG_USER?=	postgres
 PG_GROUP?=	postgres
 PG_UID?=	770
 
+PG_SUFFIX=	${PORTVERSION:R}
 LDFLAGS+=	-L${LOCALBASE}/lib
 INCLUDES+=	-I${LOCALBASE}/include
-CONFIGURE_ARGS+=--with-libraries=${PREFIX}/lib \
-		--with-includes=${PREFIX}/include \
-		--enable-thread-safety
+CONFIGURE_ARGS+=--enable-thread-safety
+.if !defined(CLIENT_ONLY)
+CONFIGURE_ARGS+=--with-libraries=${PREFIX}/lib/postgresql${PG_SUFFIX} \
+		--with-includes=${PREFIX}/include/postgresql${PG_SUFFIX} \
+		--bindir=${PREFIX}/libexec/postgresql${PG_SUFFIX} \
+		--includedir=${PREFIX}/include/postgresql${PG_SUFFIX} \
+		--libdir=${PREFIX}/lib/postgresql${PG_SUFFIX} \
+		--datadir=${DATADIR} \
+		--docdir=${DOCSDIR}
+DATADIR=	${PREFIX}/share/postgresql${PG_SUFFIX}
+DOCSDIR=	${PREFIX}/share/doc/postgresql${PG_SUFFIX}
+.endif
 CONFIGURE_ENV+=	INCLUDES="${INCLUDES}" \
 		PTHREAD_LIBS="-lpthread" \
 		LDFLAGS_SL="${LDFLAGS_SL}"
@@ -49,7 +61,7 @@ MAKE_ENV=	MAKELEVEL=0
 
 PLIST=		${PKGDIR}/pkg-plist${COMPONENT}
 
-INSTALL_DIRS?=	src/common src/timezone src/backend \
+INSTALL_DIRS?=	src/timezone src/backend \
 		src/backend/utils/mb/conversion_procs \
 		src/backend/snowball src/backend/replication/libpqwalreceiver \
 		src/backend/replication/pgoutput \
@@ -62,27 +74,21 @@ INSTALL_DIRS?=	src/common src/timezone src/backend \
 		src/bin/pg_waldump src/bin/pg_upgrade
 
 BUILD_DIRS?=	src/port ${INSTALL_DIRS}
-INSTALL_TARGET?=install-strip
 
 .if !defined(CLIENT_ONLY) && !defined(SLAVE_ONLY)
 SERVER_ONLY=	yes
 COMPONENT=	-server
-USE_RC_SUBR=	postgresql
-USES+=		pgsql:${DISTVERSION:C/([0-9]\.?[0-9]).*/\1/g}
+USE_RC_SUBR=	postgresql${PG_SUFFIX}
+USES+=		pgsql
 USERS=		${PG_USER}
 GROUPS=	${PG_GROUP}
-SUB_FILES+=	502.pgsql
+SUB_FILES+=	502.postgresql${PG_SUFFIX}
 .endif
 
-OPTIONS_SUB=	yes
-
-.if defined(CLIENT_ONLY)
-OPTIONS_DEFINE+=LIBEDIT DOCS
-LIBEDIT_DESC=	Use non-GPL libedit instead of readline
-.else
+#.if !defined(CLIENT_ONLY)
 MAKE_ENV+=	PATH=${PREFIX}/bin:${PATH}
 CONFIGURE_ENV+=	PATH=${PREFIX}/bin:${PATH}
-.endif
+#.endif
 
 .if defined(SERVER_ONLY)
 OPTIONS_DEFINE=	DTRACE LDAP INTDATE TZDATA XML DOCS
@@ -129,10 +135,6 @@ OPTIONS_DEFAULT+=	INTDATE
 
 .if !defined(SLAVE_ONLY)
 OPTIONS_DEFINE+=	NLS PAM GSSAPI OPTIMIZED_CFLAGS DEBUG DOCS
-. if ${DISTVERSION:R} == 9.2 || ${DISTVERSION:R} == 9.3
-  OPTIONS_RADIO=	KRB5
-  OPTIONS_RADIO_KRB5=	MIT_KRB5 HEIMDAL_KRB5
-. endif
 
 KRB5_DESC=		Build with kerberos provider support
 NLS_DESC=		Use internationalized messages
@@ -151,7 +153,10 @@ GSSAPI_CONFIGURE_WITH=	gssapi
 .endif # !SLAVE_ONLY
 
 .if defined(CLIENT_ONLY)
-LIBEDIT_CONFIGURE_ON+=--with-libedit-preferred
+OPTIONS_DEFINE+=LIBEDIT DOCS
+
+LIBEDIT_DESC=  Use non-GPL libedit instead of readline
+LIBEDIT_CONFIGURE_ON+=	--with-libedit-preferred
 LIBEDIT_USES=		libedit
 LIBEDIT_USES_OFF=	readline
 .endif # CLIENT_ONLY
@@ -178,11 +183,13 @@ OPTIMIZED_CFLAGS_CFLAGS=-O3 -funroll-loops
 
 DEBUG_CONFIGURE_ENABLE=	debug
 
-PLIST_SUB+=		PG_USER=${PG_USER} \
+PLIST_SUB+=		PG_SUFFIX=${PG_SUFFIX} \
+			PG_USER=${PG_USER} \
 			PG_USER_regex=[[:<:]]${PG_USER}[[:>:]] \
 			PG_GROUP=${PG_GROUP} \
 			PG_GROUP_regex=[[:<:]]${PG_GROUP}[[:>:]]
-SUB_LIST+=		PG_GROUP=${PG_GROUP} \
+SUB_LIST+=		PG_SUFFIX=${PG_SUFFIX} \
+			PG_GROUP=${PG_GROUP} \
 			PG_USER=${PG_USER} \
 			PG_UID=${PG_UID}
 
@@ -325,9 +332,8 @@ do-install:
 		${SETENV} ${MAKE_ENV} ${MAKE_CMD} ${MAKE_ARGS} ${INSTALL_TARGET}; \
 	done
 .  if defined(SERVER_ONLY)
-	@ ${MKDIR} ${STAGEDIR}${PREFIX}/share/postgresql ;\
-	${MKDIR} ${STAGEDIR}${PREFIX}/etc/periodic/daily ;\
-	${INSTALL_SCRIPT} ${WRKDIR}/502.pgsql \
+	@ ${MKDIR} ${STAGEDIR}${PREFIX}/etc/periodic/daily ;\
+	${INSTALL_SCRIPT} ${WRKDIR}/502.postgresql${PG_SUFFIX} \
 			${STAGEDIR}${PREFIX}/etc/periodic/daily
 .  endif # SERVER_ONLY
 .  if defined(CLIENT_ONLY)

@@ -5,4 +5,4 @@
 %%DATADIR%%/extension/pltcl--unpackaged--1.0.sql
 %%DATADIR%%/extension/pltclu--unpackaged--1.0.sql
 %%DOCSDIR%%/README-pltcl
-lib/postgresql/pltcl.so
+lib/postgresql%%PG_SUFFIX%%/pltcl.so

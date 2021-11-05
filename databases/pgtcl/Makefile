@@ -15,11 +15,7 @@ COMMENT=	TCL extension for accessing a PostgreSQL server (PGTCL-NG)
 LICENSE=	PostgreSQL
 LICENSE_FILE=	${WRKSRC}/COPYRIGHT
 
-.if defined(PGTCL_SLAVE)
-USES=		pgsql:${PGTCL_SLAVE}
-.else
 USES=		pgsql
-.endif
 
 USES+=		tcl:tea
 LIBDIR=		${PREFIX}/lib/${PORTNAME}

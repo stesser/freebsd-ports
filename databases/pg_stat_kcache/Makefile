@@ -10,9 +10,8 @@ COMMENT=	Gather statistics about PostgreSQL I/O and CPU usage
 
 LICENSE=	PostgreSQL
 
-USES=		gmake pgsql:9.6+
+USES=		gmake pgsql:contrib:10
 LLD_UNSAFE=	yes
-WANT_PGSQL=	server contrib
 
 USE_GITHUB=	yes
 GH_ACCOUNT=	powa-team
