@@ -678,7 +678,6 @@
     SUBDIR += postgresql10-client
     SUBDIR += postgresql10-contrib
     SUBDIR += postgresql10-docs
-    SUBDIR += postgresql10-pgtcl
     SUBDIR += postgresql10-plperl
     SUBDIR += postgresql10-plpython
     SUBDIR += postgresql10-pltcl
@@ -686,7 +685,6 @@
     SUBDIR += postgresql11-client
     SUBDIR += postgresql11-contrib
     SUBDIR += postgresql11-docs
-    SUBDIR += postgresql11-pgtcl
     SUBDIR += postgresql11-plperl
     SUBDIR += postgresql11-plpython
     SUBDIR += postgresql11-pltcl
@@ -694,7 +692,6 @@
     SUBDIR += postgresql12-client
     SUBDIR += postgresql12-contrib
     SUBDIR += postgresql12-docs
-    SUBDIR += postgresql12-pgtcl
     SUBDIR += postgresql12-plperl
     SUBDIR += postgresql12-plpython
     SUBDIR += postgresql12-pltcl
@@ -702,7 +699,6 @@
     SUBDIR += postgresql13-client
     SUBDIR += postgresql13-contrib
     SUBDIR += postgresql13-docs
-    SUBDIR += postgresql13-pgtcl
     SUBDIR += postgresql13-plperl
     SUBDIR += postgresql13-plpython
     SUBDIR += postgresql13-pltcl
@@ -710,7 +706,6 @@
     SUBDIR += postgresql14-client
     SUBDIR += postgresql14-contrib
     SUBDIR += postgresql14-docs
-    SUBDIR += postgresql14-pgtcl
     SUBDIR += postgresql14-plperl
     SUBDIR += postgresql14-plpython
     SUBDIR += postgresql14-pltcl
@@ -718,7 +713,6 @@
     SUBDIR += postgresql96-client
     SUBDIR += postgresql96-contrib
     SUBDIR += postgresql96-docs
-    SUBDIR += postgresql96-pgtcl
     SUBDIR += postgresql96-plperl
     SUBDIR += postgresql96-plpython
     SUBDIR += postgresql96-pltcl
