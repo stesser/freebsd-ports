@@ -161,7 +161,7 @@ _USE_PGSQL_DEP_contrib=	vacuumlo
 _USE_PGSQL_DEP_plperl=	postgresql${PGSQL_VER_NODOT}-plperl>0
 _USE_PGSQL_DEP_plpython=postgresql${PGSQL_VER_NODOT}-plpython>0
 _USE_PGSQL_DEP_pltcl=	postgresql${PGSQL_VER_NODOT}-pltcl>0
-_USE_PGSQL_DEP_server=	${LOCALBASE}/libexec/postgresql${PGSQL_VER_NODOT}/postgres
+_USE_PGSQL_DEP_server=	${LOCALBASE}/libexec/postgresql${PGSQL_VER}/postgres
 .    if defined(WANT_PGSQL)
 .      for depend in ${_USE_PGSQL_DEP}
 .        if ${WANT_PGSQL:M${depend}}
