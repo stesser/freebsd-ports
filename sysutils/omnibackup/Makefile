@@ -53,8 +53,6 @@ RUN_DEPENDS+=	slapcat:net/openldap24-server
 .endif
 .if ${PORT_OPTIONS:MPGSQL}
 USES+=	pgsql
-RUN_DEPENDS+=	pg_dump:databases/postgresql${PGSQL_VER_NODOT}-client
-RUN_DEPENDS+=	pg_dumpall:databases/postgresql${PGSQL_VER_NODOT}-client
 .endif
 .if ${PORT_OPTIONS:MMYSQL}
 USES+=	mysql

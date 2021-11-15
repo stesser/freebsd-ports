@@ -10,8 +10,6 @@ LICENSE_FILE=	${WRKSRC}/LICENSE
 
 ONLY_FOR_ARCHS=	amd64 i386
 
-BUILD_DEPENDS=	pg_config:databases/postgresql${PGSQL_DEFAULT}-client
-
 USES=		cabal pgsql
 
 USE_RC_SUBR=	postgrest
