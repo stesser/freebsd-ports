@@ -45,7 +45,7 @@ CONFIGURE_ARGS+=--enable-thread-safety
 .if !defined(CLIENT_ONLY)
 CONFIGURE_ARGS+=--with-libraries=${PREFIX}/lib/postgresql${PG_SUFFIX} \
 		--with-includes=${PREFIX}/include/postgresql${PG_SUFFIX} \
-		--bindir=${PREFIX}/libexec/postgresql${PG_SUFFIX} \
+		--program-suffix=${PG_SUFFIX} \
 		--includedir=${PREFIX}/include/postgresql${PG_SUFFIX} \
 		--libdir=${PREFIX}/lib/postgresql${PG_SUFFIX} \
 		--datadir=${DATADIR} \

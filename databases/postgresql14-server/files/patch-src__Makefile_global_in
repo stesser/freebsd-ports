@@ -1,0 +1,11 @@
+--- src/Makefile.global.in.orig	2021-11-16 17:15:30.015425000 +0100
++++ src/Makefile.global.in	2021-11-16 17:15:56.323599000 +0100
+@@ -321,7 +321,7 @@
+ LDOUT = -o
+ RANLIB = @RANLIB@
+ WINDRES = @WINDRES@
+-X = @EXEEXT@
++X = $(MAJORVERSION)
+ 
+ # Perl
+ 

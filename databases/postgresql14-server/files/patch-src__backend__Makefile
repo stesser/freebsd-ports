@@ -1,0 +1,11 @@
+--- src/backend/Makefile.orig	2021-11-16 17:40:05.813901000 +0100
++++ src/backend/Makefile	2021-11-16 17:41:14.667125000 +0100
+@@ -72,7 +72,7 @@
+ ifeq ($(PORTNAME), cygwin)
+ 
+ postgres: $(OBJS)
+-	$(CC) $(CFLAGS) $(call expand_subsys,$^) $(LDFLAGS) $(LDFLAGS_EX) $(export_dynamic) -Wl,--stack,$(WIN32_STACK_RLIMIT) -Wl,--export-all-symbols -Wl,--out-implib=libpostgres.a $(LIBS) -o $@
++	$(CC) $(CFLAGS) $(call expand_subsys,$^) $(LDFLAGS) $(LDFLAGS_EX) $(export_dynamic) -Wl,--stack,$(WIN32_STACK_RLIMIT) -Wl,--export-all-symbols -Wl,--out-implib=libpostgres.a $(LIBS) -o $@$(X)
+ 
+ # libpostgres.a is actually built in the preceding rule, but we need this to
+ # ensure it's newer than postgres; see notes in src/backend/parser/Makefile

@@ -1,0 +1,11 @@
+--- src/timezone/Makefile.orig	2021-11-16 17:30:57.302120000 +0100
++++ src/timezone/Makefile	2021-11-16 17:31:50.867028000 +0100
+@@ -56,7 +56,7 @@
+ 
+ install: all installdirs
+ ifeq (,$(with_system_tzdata))
+-	$(ZIC) -d '$(DESTDIR)$(datadir)/timezone' $(ZIC_OPTIONS) $(TZDATAFILES)
++	$(ZIC)$(X) -d '$(DESTDIR)$(datadir)/timezone' $(ZIC_OPTIONS) $(TZDATAFILES)
+ endif
+ 	$(MAKE) -C tznames $@
+ 
