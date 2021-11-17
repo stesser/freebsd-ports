@@ -1,6 +1,6 @@
 #!/bin/sh
 
-# PROVIDE: postgresql%%PG_SUFFIX%%
+# PROVIDE: postgresql
 # REQUIRE: DAEMON
 # KEYWORD: shutdown
 #
@@ -51,11 +51,13 @@ initdb_cmd="${name}_initdb"
 
 su_cmd="/usr/bin/su"
 
+pg_profiles=postgresql%%PG_SUFFIX%%_profiles
+
 if [ -n "$2" ]; then
 	profile="$2"
-	if [ "x${postgresql%%PG_SUFFIX%%_profiles}" != "x" ]; then
+	if [ -n "${pg_profiles}" ]; then
 		eval ${name}_data="\${${name}_${profile}_data:-}"
-		if [ "x${postgresql%%PG_SUFFIX%%_data}" = "x" ]; then
+		if [ -z "${postgresql%%PG_SUFFIX%%_data}" ]; then
 			echo "You must define a data directory (${name}_${profile}_data)"
 			exit 1
 		fi
@@ -65,8 +67,8 @@ if [ -n "$2" ]; then
 		eval ${name}_initdb_flags="\${${name}_${profile}_initdb_flags:-\${${name}_initdb_flags}}"
 	fi
 else
-	if [ "x${postgresql%%PG_SUFFIX%%_profiles}" != "x" -a "x$1" != "x" ]; then
-		for profile in ${postgresql%%PG_SUFFIX%%_profiles}; do
+	if [ -n "${pg_profiles}" -a -n "$1" ]; then
+		for profile in ${pg_profiles}; do
 			eval _enable="\${${name}_${profile}_enable}"
 			case "x${_enable:-${postgresql%%PG_SUFFIX%%_enable}}" in
 			x|x[Nn][Oo]|x[Nn][Oo][Nn][Ee])
