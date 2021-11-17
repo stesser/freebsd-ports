@@ -43,9 +43,8 @@ LDFLAGS+=	-L${LOCALBASE}/lib
 INCLUDES+=	-I${LOCALBASE}/include
 CONFIGURE_ARGS+=--enable-thread-safety
 .if !defined(CLIENT_ONLY)
-CONFIGURE_ARGS+=--with-libraries=${PREFIX}/lib/postgresql${PG_SUFFIX} \
-		--with-includes=${PREFIX}/include/postgresql${PG_SUFFIX} \
-		--bindir=${PREFIX}/libexec/postgresql${PG_SUFFIX} \
+CONFIGURE_ARGS+=--with-libraries=${PREFIX}/lib \
+		--with-includes=${PREFIX}/include \
 		--includedir=${PREFIX}/include/postgresql${PG_SUFFIX} \
 		--libdir=${PREFIX}/lib/postgresql${PG_SUFFIX} \
 		--datadir=${DATADIR} \
@@ -335,6 +334,15 @@ do-install:
 	@ ${MKDIR} ${STAGEDIR}${PREFIX}/etc/periodic/daily ;\
 	${INSTALL_SCRIPT} ${WRKDIR}/502.postgresql${PG_SUFFIX} \
 			${STAGEDIR}${PREFIX}/etc/periodic/daily
+	for binfile in ${STAGEDIR}${PREFIX}/bin/*; do \
+		${MV} $${binfile} $${binfile}${PG_SUFFIX}; \
+	done
+	${RLN} ${STAGEDIR}${PREFIX}/bin/postgres${PG_SUFFIX} \
+			${STAGEDIR}${PREFIX}/bin/postmaster${PG_SUFFIX}
+	for binfile in 	${STAGEDIR}${PREFIX}/bin/* \
+			${STAGEDIR}${PREFIX}/lib/postgresql${PG_SUFFIX}/*.so; do \
+		if [ -x $${binfile} ]; then ${STRIP_CMD} $${binfile}; fi \
+	done
 .  endif # SERVER_ONLY
 .  if defined(CLIENT_ONLY)
 	@ cd ${WRKSRC}/src && ${SETENV} ${MAKE_ENV} ${MAKE_CMD} ${MAKE_ARGS} install-local
