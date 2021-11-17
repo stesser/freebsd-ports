@@ -22,21 +22,23 @@
 #
 # For postmaster startup options, edit ${postgresql%%PG_SUFFIX%%_data}/postgresql.conf
 
-command=%%PREFIX%%/libexec/postgresql%%PG_SUFFIX%%/pg_ctl
+command=%%PREFIX%%/bin/pg_ctl%%PG_SUFFIX%%
 
 . /etc/rc.subr
 
-load_rc_config postgresql%%PG_SUFFIX%%
+name=postgresql%%PG_SUFFIX%%
+load_rc_config ${name}
 
 # set defaults
-postgresql%%PG_SUFFIX%%_enable=${postgresql%%PG_SUFFIX%%_enable:-"NO"}
-postgresql%%PG_SUFFIX%%_flags=${postgresql%%PG_SUFFIX%%_flags:-"-w -s -m fast"}
-postgresql%%PG_SUFFIX%%_user=${postgresql%%PG_SUFFIX%%_user:-"%%PG_USER%%"}
-eval postgresql%%PG_SUFFIX%%_data=${postgresql%%PG_SUFFIX%%_data:-"~${postgresql%%PG_SUFFIX%%_user}/data%%PG_SUFFIX%%"}
-postgresql%%PG_SUFFIX%%_login_class=${postgresql%%PG_SUFFIX%%_login_class:-"default"}
-postgresql%%PG_SUFFIX%%_initdb_flags=${postgresql%%PG_SUFFIX%%_initdb_flags:-"--encoding=utf-8 --lc-collate=C"}
+eval pgdir="~$}
+: ${postgresql%%PG_SUFFIX%%_enable:="NO"}
+: ${postgresql%%PG_SUFFIX%%_flags:="-w -s -m fast"}
+: ${postgresql%%PG_SUFFIX%%_user:="%%PG_USER%%"}
+eval pghome="~${postgresql%%PG_SUFFIX%%_user}"
+: ${postgresql%%PG_SUFFIX%%_data:="${pghome}/data%%PG_SUFFIX%%"}
+: ${postgresql%%PG_SUFFIX%%_login_class:="default"}
+: ${postgresql%%PG_SUFFIX%%_initdb_flags:="--encoding=utf-8 --lc-collate=C"}
 
-name=postgresql%%PG_SUFFIX%%
 rcvar=${name}_enable
 extra_commands="reload initdb"
 
@@ -51,7 +53,7 @@ initdb_cmd="${name}_initdb"
 
 su_cmd="/usr/bin/su"
 
-pg_profiles=postgresql%%PG_SUFFIX%%_profiles
+pg_profiles=${name}_profiles
 
 if [ -n "$2" ]; then
 	profile="$2"
@@ -111,7 +113,7 @@ postgresql%%PG_SUFFIX%%_command()
 
 postgresql%%PG_SUFFIX%%_initdb()
 {
-    ${su_cmd} -l -c ${postgresql%%PG_SUFFIX%%_login_class} ${postgresql%%PG_SUFFIX%%_user} -c "exec %%PREFIX%%/libexec/${name}/initdb ${postgresql%%PG_SUFFIX%%_initdb_flags} -D ${postgresql%%PG_SUFFIX%%_data} -U ${postgresql%%PG_SUFFIX%%_user}"
+    ${su_cmd} -l -c ${postgresql%%PG_SUFFIX%%_login_class} ${postgresql%%PG_SUFFIX%%_user} -c "exec %%PREFIX%%/bin/initdb%%PG_SUFFIX%% ${postgresql%%PG_SUFFIX%%_initdb_flags} -D ${postgresql%%PG_SUFFIX%%_data} -U ${postgresql%%PG_SUFFIX%%_user}"
 }
 
 run_rc_command "$1"

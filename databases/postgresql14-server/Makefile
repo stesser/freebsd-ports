@@ -57,6 +57,7 @@ CONFIGURE_ENV+=	INCLUDES="${INCLUDES}" \
 		LDFLAGS_SL="${LDFLAGS_SL}"
 LDFLAGS+=	-lpthread
 MAKE_ENV=	MAKELEVEL=0
+INSTALL_TARGET=	install-strip
 
 PLIST=		${PKGDIR}/pkg-plist${COMPONENT}
 
@@ -80,7 +81,7 @@ COMPONENT=	-server
 USE_RC_SUBR=	postgresql${PG_SUFFIX}
 USES+=		pgsql
 USERS=		${PG_USER}
-GROUPS=	${PG_GROUP}
+GROUPS=		${PG_GROUP}
 SUB_FILES+=	502.postgresql${PG_SUFFIX}
 .endif
 
@@ -330,23 +331,25 @@ do-install:
 	    cd ${WRKSRC}/$${dir} && \
 		${SETENV} ${MAKE_ENV} ${MAKE_CMD} ${MAKE_ARGS} ${INSTALL_TARGET}; \
 	done
+.  if defined(CLIENT_ONLY)
+	@ cd ${WRKSRC}/src && ${SETENV} ${MAKE_ENV} ${MAKE_CMD} ${MAKE_ARGS} install-local
+.  else
+	for binfile in ${STAGEDIR}${PREFIX}/bin/*; do \
+		if [ -r $${binfile} -o -L $${binfile} ]; then \
+			${MV} $${binfile} $${binfile}${PG_SUFFIX} ;\
+		fi; \
+	done
+.  endif
 .  if defined(SERVER_ONLY)
 	@ ${MKDIR} ${STAGEDIR}${PREFIX}/etc/periodic/daily ;\
 	${INSTALL_SCRIPT} ${WRKDIR}/502.postgresql${PG_SUFFIX} \
 			${STAGEDIR}${PREFIX}/etc/periodic/daily
-	for binfile in ${STAGEDIR}${PREFIX}/bin/*; do \
-		${MV} $${binfile} $${binfile}${PG_SUFFIX}; \
-	done
 	${RLN} ${STAGEDIR}${PREFIX}/bin/postgres${PG_SUFFIX} \
 			${STAGEDIR}${PREFIX}/bin/postmaster${PG_SUFFIX}
-	for binfile in 	${STAGEDIR}${PREFIX}/bin/* \
-			${STAGEDIR}${PREFIX}/lib/postgresql${PG_SUFFIX}/*.so; do \
+.  endif # SERVER_ONLY
+	for binfile in ${STAGEDIR}${PREFIX}/lib/postgresql${PG_SUFFIX}/*.so; do \
 		if [ -x $${binfile} ]; then ${STRIP_CMD} $${binfile}; fi \
 	done
-.  endif # SERVER_ONLY
-.  if defined(CLIENT_ONLY)
-	@ cd ${WRKSRC}/src && ${SETENV} ${MAKE_ENV} ${MAKE_CMD} ${MAKE_ARGS} install-local
-.  endif
 	@ if [ -r ${PKGMESSAGE} ]; then \
 		${MKDIR} ${STAGEDIR}${DOCSDIR} ;\
 		${INSTALL_DATA} ${PKGMESSAGE} ${STAGEDIR}${DOCSDIR}/README${COMPONENT} ;\

@@ -1,6 +1,6 @@
-libexec/postgresql%%PG_SUFFIX%%/oid2name
-libexec/postgresql%%PG_SUFFIX%%/pg_standby
-libexec/postgresql%%PG_SUFFIX%%/vacuumlo
+bin/oid2name%%PG_SUFFIX%%
+bin/pg_standby%%PG_SUFFIX%%
+bin/vacuumlo%%PG_SUFFIX%%
 lib/postgresql%%PG_SUFFIX%%/_int.so
 lib/postgresql%%PG_SUFFIX%%/adminpack.so
 lib/postgresql%%PG_SUFFIX%%/amcheck.so

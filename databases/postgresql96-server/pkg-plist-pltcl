@@ -6,7 +6,7 @@
 %%DATADIR%%/extension/pltclu--unpackaged--1.0.sql
 %%DOCSDIR%%/README-pltcl
 lib/postgresql%%PG_SUFFIX%%/pltcl.so
-libexec/postgresql%%PG_SUFFIX%%/pltcl_loadmod
-libexec/postgresql%%PG_SUFFIX%%/pltcl_delmod
-libexec/postgresql%%PG_SUFFIX%%/pltcl_listmod
+bin/pltcl_loadmod%%PG_SUFFIX%%
+bin/pltcl_delmod%%PG_SUFFIX%%
+bin/pltcl_listmod%%PG_SUFFIX%%
 %%DATADIR%%/unknown.pltcl

@@ -1,5 +1,5 @@
-libexec/postgresql%%PG_SUFFIX%%/oid2name
-libexec/postgresql%%PG_SUFFIX%%/vacuumlo
+bin/oid2name%%PG_SUFFIX%%
+bin/vacuumlo%%PG_SUFFIX%%
 include/postgresql%%PG_SUFFIX%%/server/extension/cube/cubedata.h
 include/postgresql%%PG_SUFFIX%%/server/extension/hstore/hstore.h
 include/postgresql%%PG_SUFFIX%%/server/extension/isn/isn.h
