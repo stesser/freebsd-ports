@@ -1,7 +1,7 @@
 # Provide support for PostgreSQL (pgsql)
 #
 # Feature:	pgsql
-# Usage:	USES=	pgsql[:server|contrib|plperl|pltcl|plpython,...]
+# Usage:	USES=	pgsql[:server|contrib|plperl|pltcl|plpython,...][,version]
 #
 # 		Most ports require only connectivity to a postgresql database
 # 		cluster. These ports must not depends on the server component,
@@ -16,10 +16,10 @@
 # 		13 for an explicit version). Example:
 #
 #		    USES=pgsql		# a client app depending on libpq or psql
-#		    USES=pgsql:server:13	# Only use PostgreSQL 13
-#		    USES=pgsql:server:9.6	# Use PostgreSQL 9.6 or newer
-#		    USES=pgsql:server:11-13	# Use PostgreSQL between 11 & 13
-#		    USES=pgsql:contrib:11-	# Use any PostgreSQL server up to 11 and
+#		    USES=pgsql:server,13	# Only use PostgreSQL 13
+#		    USES=pgsql:server,9.6	# Use PostgreSQL 9.6 or newer
+#		    USES=pgsql:server,11-13	# Use PostgreSQL between 11 & 13
+#		    USES=pgsql:contrib,11-	# Use any PostgreSQL server up to 11 and
 #		    				# and also require the contrib component
 #
 #
