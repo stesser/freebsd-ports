@@ -1,8 +1,8 @@
 %%PG_INCLUDE_DIR%%/server/plpy_util.h
 %%PG_INCLUDE_DIR%%/server/plpython.h
 %%DOCSDIR%%/README-plpython
-%%PYTHON2%%lib/postgresql%%PG_SUFFIX%%/plpython2.so
-%%PYTHON3%%lib/postgresql%%PG_SUFFIX%%/plpython3.so
+%%PYTHON2%%%%PG_LIB_DIR%%/plpython2.so
+%%PYTHON3%%%%PG_LIB_DIR%%/plpython3.so
 %%PYTHON2%%%%DATADIR%%/extension/plpython2u--1.0.sql
 %%PYTHON2%%%%DATADIR%%/extension/plpython2u--unpackaged--1.0.sql
 %%PYTHON2%%%%DATADIR%%/extension/plpython2u.control

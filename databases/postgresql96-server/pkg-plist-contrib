@@ -1,6 +1,6 @@
-bin/oid2name%%PG_SUFFIX%%
-bin/pg_standby%%PG_SUFFIX%%
-bin/vacuumlo%%PG_SUFFIX%%
+%%PG_BIN_DIR%%/oid2name
+%%PG_BIN_DIR%%/pg_standby
+%%PG_BIN_DIR%%/vacuumlo
 %%PG_LIB_DIR%%/_int.so
 %%PG_LIB_DIR%%/adminpack.so
 %%PG_LIB_DIR%%/auth_delay.so
@@ -35,7 +35,7 @@ bin/vacuumlo%%PG_SUFFIX%%
 %%PG_LIB_DIR%%/pgcrypto.so
 %%PG_LIB_DIR%%/pgrowlocks.so
 %%PG_LIB_DIR%%/pgstattuple.so
-%%XML%%lib/postgresql%%PG_SUFFIX%%/pgxml.so
+%%XML%%%%PG_LIB_DIR%%/pgxml.so
 %%PG_LIB_DIR%%/postgres_fdw.so
 %%PG_LIB_DIR%%/refint.so
 %%PG_LIB_DIR%%/seg.so

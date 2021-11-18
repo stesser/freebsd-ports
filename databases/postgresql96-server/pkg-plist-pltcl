@@ -6,7 +6,7 @@
 %%DATADIR%%/extension/pltclu--unpackaged--1.0.sql
 %%DOCSDIR%%/README-pltcl
 %%PG_LIB_DIR%%/pltcl.so
-bin/pltcl_loadmod%%PG_SUFFIX%%
-bin/pltcl_delmod%%PG_SUFFIX%%
-bin/pltcl_listmod%%PG_SUFFIX%%
+%%PG_BIN_DIR%%/pltcl_loadmod
+%%PG_BIN_DIR%%/pltcl_delmod
+%%PG_BIN_DIR%%/pltcl_listmod
 %%DATADIR%%/unknown.pltcl

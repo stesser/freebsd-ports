@@ -18,9 +18,9 @@ COMPONENT=	-client
 USE_LDCONFIG=	yes
 USES=		pkgconfig
 
-PG_SUFFIX=
-PG_INCLUDE_DIR=	include
-PG_LIB_DIR=	lib
+#PG_SUFFIX=
+#PG_INCLUDE_DIR=	include
+#PG_LIB_DIR=	lib
 
 CONFLICTS+=	${PORTNAME}9?-client ${PORTNAME}1[^${PORTVERSION:R:C/.*([0-9]$)/\\1/}]-client
 

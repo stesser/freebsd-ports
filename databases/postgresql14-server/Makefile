@@ -40,22 +40,29 @@ PG_UID?=	770
 
 PG_VERSION=	${PORTVERSION:R}
 PG_SUFFIX?=	${PG_VERSION:S/.//}
+PG_BIN_DIR?=	libexec/postgresql${PG_SUFFIX:S/.//}
 PG_INCLUDE_DIR?=include/postgresql${PG_SUFFIX}
 PG_LIB_DIR?=	lib/postgresql${PG_SUFFIX}
 
 LDFLAGS+=	-L${LOCALBASE}/lib
 INCLUDES+=	-I${LOCALBASE}/include
 CONFIGURE_ARGS+=--enable-thread-safety
-.if !defined(CLIENT_ONLY)
+.if defined(CLIENT_ONLY)
+PG_SUFFIX=
+PG_BIN_DIR=	bin
+PG_INCLUDE_DIR=	include
+PG_LIB_DIR=	lib
+.else
 CONFIGURE_ARGS+=--with-libraries=${PREFIX}/lib \
 		--with-includes=${PREFIX}/include \
+		--bindir=${PREFIX}/${PG_BIN_DIR} \
 		--includedir=${PREFIX}/${PG_INCLUDE_DIR} \
 		--libdir=${PREFIX}/${PG_LIB_DIR} \
 		--datadir=${DATADIR} \
 		--docdir=${DOCSDIR}
-.endif
 DATADIR=	${PREFIX}/share/postgresql${PG_SUFFIX}
 DOCSDIR=	${PREFIX}/share/doc/postgresql${PG_SUFFIX}
+.endif
 CONFIGURE_ENV+=	INCLUDES="${INCLUDES}" \
 		PTHREAD_LIBS="-lpthread" \
 		LDFLAGS_SL="${LDFLAGS_SL}"
@@ -187,8 +194,11 @@ OPTIMIZED_CFLAGS_CFLAGS=-O3 -funroll-loops
 
 DEBUG_CONFIGURE_ENABLE=	debug
 
+.include <bsd.port.options.mk>
+
 PLIST_SUB+=		PG_VERSION=${PG_VERSION} \
 			PG_SUFFIX=${PG_SUFFIX} \
+			PG_BIN_DIR=${PG_BIN_DIR} \
 			PG_INCLUDE_DIR=${PG_INCLUDE_DIR} \
 			PG_LIB_DIR=${PG_LIB_DIR} \
 			PG_USER=${PG_USER} \
@@ -199,8 +209,6 @@ SUB_LIST+=		PG_VERSION=${PG_VERSION} \
 			PG_GROUP=${PG_GROUP} \
 			PG_USER=${PG_USER} \
 			PG_UID=${PG_UID}
-
-.include <bsd.port.options.mk>
 
 .if ${ARCH} == "i386"
 USES+=		compiler:gcc-c++11-lib
@@ -342,20 +350,11 @@ do-install:
 	@ cd ${WRKSRC}/src && ${SETENV} ${MAKE_ENV} ${MAKE_CMD} ${MAKE_ARGS} install-local
 	@ cd ${WRKSRC}/src/include && ${SETENV} ${MAKE_ENV} ${MAKE_CMD} ${MAKE_ARGS} install-client
 .  endif
-.  if ("${PG_SUFFIX}" != "")
-	for binfile in ${STAGEDIR}${PREFIX}/bin/*; do \
-		if [ -r $${binfile} -o -L $${binfile} ]; then \
-			${MV} $${binfile} $${binfile}${PG_SUFFIX} ;\
-		fi; \
-	done
-.  endif
 .  if defined(SERVER_ONLY)
 	@ cd ${WRKSRC}/src/include && ${SETENV} ${MAKE_ENV} ${MAKE_CMD} ${MAKE_ARGS} install-server
 	@ ${MKDIR} ${STAGEDIR}${PREFIX}/etc/periodic/daily ;\
 	${INSTALL_SCRIPT} ${WRKDIR}/502.postgresql${PG_SUFFIX} \
 			${STAGEDIR}${PREFIX}/etc/periodic/daily
-	${RLN} ${STAGEDIR}${PREFIX}/bin/postgres${PG_SUFFIX} \
-			${STAGEDIR}${PREFIX}/bin/postmaster${PG_SUFFIX}
 .  endif # SERVER_ONLY
 	for libfile in ${STAGEDIR}${PREFIX}/${PG_LIB_DIR}/*.so; do \
 		if [ -x $${libfile} ]; then ${STRIP_CMD} $${libfile}; fi ;\

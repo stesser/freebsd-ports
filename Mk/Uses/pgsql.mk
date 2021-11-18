@@ -157,11 +157,11 @@ LIB_DEPENDS+=	libpq.so.${PGSQL${PGSQL_VER_NODOT}_LIBVER}:databases/postgresql-cl
 .endif
 
 _USE_PGSQL_DEP=		contrib plperl plpython pltcl server
-_USE_PGSQL_DEP_contrib=	${LOCALBASE}/bin/vacuumlo${PGSQL_VER}
+_USE_PGSQL_DEP_contrib=	${LOCALBASE}/libexec/postgresql${PGSQL_VER_NODOT}/vacuumlo
 _USE_PGSQL_DEP_plperl=	postgresql${PGSQL_VER_NODOT}-plperl>0
 _USE_PGSQL_DEP_plpython=postgresql${PGSQL_VER_NODOT}-plpython>0
 _USE_PGSQL_DEP_pltcl=	postgresql${PGSQL_VER_NODOT}-pltcl>0
-_USE_PGSQL_DEP_server=	${LOCALBASE}/bin/postgres${PGSQL_VER}
+_USE_PGSQL_DEP_server=	${LOCALBASE}/libexec/postgresql${PGSQL_VER_NODOT}/postgres
 .    if defined(WANT_PGSQL)
 .      for depend in ${_USE_PGSQL_DEP}
 .        if ${WANT_PGSQL:M${depend}}
