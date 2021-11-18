@@ -1,5 +1,5 @@
-include/postgresql%%PG_SUFFIX%%/server/plpy_util.h
-include/postgresql%%PG_SUFFIX%%/server/plpython.h
+%%PG_INCLUDE_DIR%%/server/plpy_util.h
+%%PG_INCLUDE_DIR%%/server/plpython.h
 %%DOCSDIR%%/README-plpython
 %%PYTHON2%%lib/postgresql%%PG_SUFFIX%%/plpython2.so
 %%PYTHON3%%lib/postgresql%%PG_SUFFIX%%/plpython3.so
@@ -12,8 +12,8 @@ include/postgresql%%PG_SUFFIX%%/server/plpython.h
 %%PYTHON2%%%%DATADIR%%/extension/plpythonu--1.0.sql
 %%PYTHON2%%%%DATADIR%%/extension/plpythonu--unpackaged--1.0.sql
 %%PYTHON2%%%%DATADIR%%/extension/plpythonu.control
-lib/postgresql%%PG_SUFFIX%%/hstore_plpython3.so
-lib/postgresql%%PG_SUFFIX%%/ltree_plpython3.so
+%%PG_LIB_DIR%%/hstore_plpython3.so
+%%PG_LIB_DIR%%/ltree_plpython3.so
 %%DATADIR%%/extension/hstore_plpython2u--1.0.sql
 %%DATADIR%%/extension/hstore_plpython2u.control
 %%DATADIR%%/extension/hstore_plpython3u--1.0.sql

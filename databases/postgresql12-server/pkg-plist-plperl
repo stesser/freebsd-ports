@@ -1,6 +1,6 @@
-include/postgresql%%PG_SUFFIX%%/server/plperl.h
-include/postgresql%%PG_SUFFIX%%/server/plperl_helpers.h
-include/postgresql%%PG_SUFFIX%%/server/ppport.h
+%%PG_INCLUDE_DIR%%/server/plperl.h
+%%PG_INCLUDE_DIR%%/server/plperl_helpers.h
+%%PG_INCLUDE_DIR%%/server/ppport.h
 %%DATADIR%%/extension/plperlu--1.0.sql
 %%DATADIR%%/extension/plperl.control
 %%DATADIR%%/extension/plperl--1.0.sql
@@ -8,9 +8,9 @@ include/postgresql%%PG_SUFFIX%%/server/ppport.h
 %%DATADIR%%/extension/plperlu--unpackaged--1.0.sql
 %%DATADIR%%/extension/plperl--unpackaged--1.0.sql
 %%DOCSDIR%%/README-plperl
-lib/postgresql%%PG_SUFFIX%%/plperl.so
-lib/postgresql%%PG_SUFFIX%%/hstore_plperl.so
-lib/postgresql%%PG_SUFFIX%%/jsonb_plperl.so
+%%PG_LIB_DIR%%/plperl.so
+%%PG_LIB_DIR%%/hstore_plperl.so
+%%PG_LIB_DIR%%/jsonb_plperl.so
 %%DATADIR%%/extension/hstore_plperl--1.0.sql
 %%DATADIR%%/extension/hstore_plperl.control
 %%DATADIR%%/extension/hstore_plperlu--1.0.sql

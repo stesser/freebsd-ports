@@ -1,0 +1,34 @@
+--- src/include/Makefile.orig	2021-11-08 22:58:24.000000000 +0100
++++ src/include/Makefile	2021-11-18 00:27:59.393448000 +0100
+@@ -27,7 +27,9 @@
+ 	port/win32/sys portability
+ 
+ # Install all headers
+-install: all installdirs
++install: all install-client install-server
++
++install-client:	all install-client-dirs
+ # These headers are needed by the public headers of the interfaces.
+ 	$(INSTALL_DATA) $(srcdir)/postgres_ext.h   '$(DESTDIR)$(includedir)'
+ 	$(INSTALL_DATA) $(srcdir)/libpq/libpq-fs.h '$(DESTDIR)$(includedir)/libpq'
+@@ -40,6 +42,8 @@
+ 	$(INSTALL_DATA) $(srcdir)/port.h         '$(DESTDIR)$(includedir_internal)'
+ 	$(INSTALL_DATA) $(srcdir)/postgres_fe.h  '$(DESTDIR)$(includedir_internal)'
+ 	$(INSTALL_DATA) $(srcdir)/libpq/pqcomm.h '$(DESTDIR)$(includedir_internal)/libpq'
++
++install-server:	all install-server-dirs
+ # These headers are needed for server-side development
+ 	$(INSTALL_DATA) pg_config.h     '$(DESTDIR)$(includedir_server)'
+ 	$(INSTALL_DATA) pg_config_ext.h '$(DESTDIR)$(includedir_server)'
+@@ -64,8 +68,10 @@
+ 	  chmod $(INSTALL_DATA_MODE) *.h || exit; \
+ 	done
+ 
+-installdirs:
++install-client-dirs:
+ 	$(MKDIR_P) '$(DESTDIR)$(includedir)/libpq' '$(DESTDIR)$(includedir_internal)/libpq'
++
++install-server-dirs:
+ 	$(MKDIR_P) $(addprefix '$(DESTDIR)$(includedir_server)'/, $(SUBDIRS))
+ 
+ 

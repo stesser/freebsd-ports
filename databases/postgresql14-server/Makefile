@@ -38,20 +38,24 @@ PG_USER?=	postgres
 PG_GROUP?=	postgres
 PG_UID?=	770
 
-PG_SUFFIX=	${PORTVERSION:R}
+PG_VERSION=	${PORTVERSION:R}
+PG_SUFFIX?=	${PG_VERSION:S/.//}
+PG_INCLUDE_DIR?=include/postgresql${PG_SUFFIX}
+PG_LIB_DIR?=	lib/postgresql${PG_SUFFIX}
+
 LDFLAGS+=	-L${LOCALBASE}/lib
 INCLUDES+=	-I${LOCALBASE}/include
 CONFIGURE_ARGS+=--enable-thread-safety
 .if !defined(CLIENT_ONLY)
 CONFIGURE_ARGS+=--with-libraries=${PREFIX}/lib \
 		--with-includes=${PREFIX}/include \
-		--includedir=${PREFIX}/include/postgresql${PG_SUFFIX} \
-		--libdir=${PREFIX}/lib/postgresql${PG_SUFFIX} \
+		--includedir=${PREFIX}/${PG_INCLUDE_DIR} \
+		--libdir=${PREFIX}/${PG_LIB_DIR} \
 		--datadir=${DATADIR} \
 		--docdir=${DOCSDIR}
+.endif
 DATADIR=	${PREFIX}/share/postgresql${PG_SUFFIX}
 DOCSDIR=	${PREFIX}/share/doc/postgresql${PG_SUFFIX}
-.endif
 CONFIGURE_ENV+=	INCLUDES="${INCLUDES}" \
 		PTHREAD_LIBS="-lpthread" \
 		LDFLAGS_SL="${LDFLAGS_SL}"
@@ -73,7 +77,7 @@ INSTALL_DIRS?=	src/timezone src/backend \
 		src/bin/pg_test_fsync src/bin/pg_test_timing \
 		src/bin/pg_waldump src/bin/pg_upgrade
 
-BUILD_DIRS?=	src/port ${INSTALL_DIRS}
+BUILD_DIRS?=	src/port src/include ${INSTALL_DIRS}
 
 .if !defined(CLIENT_ONLY) && !defined(SLAVE_ONLY)
 SERVER_ONLY=	yes
@@ -183,12 +187,15 @@ OPTIMIZED_CFLAGS_CFLAGS=-O3 -funroll-loops
 
 DEBUG_CONFIGURE_ENABLE=	debug
 
-PLIST_SUB+=		PG_SUFFIX=${PG_SUFFIX} \
+PLIST_SUB+=		PG_VERSION=${PG_VERSION} \
+			PG_SUFFIX=${PG_SUFFIX} \
+			PG_INCLUDE_DIR=${PG_INCLUDE_DIR} \
+			PG_LIB_DIR=${PG_LIB_DIR} \
 			PG_USER=${PG_USER} \
 			PG_USER_regex=[[:<:]]${PG_USER}[[:>:]] \
 			PG_GROUP=${PG_GROUP} \
 			PG_GROUP_regex=[[:<:]]${PG_GROUP}[[:>:]]
-SUB_LIST+=		PG_SUFFIX=${PG_SUFFIX} \
+SUB_LIST+=		PG_VERSION=${PG_VERSION} \
 			PG_GROUP=${PG_GROUP} \
 			PG_USER=${PG_USER} \
 			PG_UID=${PG_UID}
@@ -333,7 +340,9 @@ do-install:
 	done
 .  if defined(CLIENT_ONLY)
 	@ cd ${WRKSRC}/src && ${SETENV} ${MAKE_ENV} ${MAKE_CMD} ${MAKE_ARGS} install-local
-.  else
+	@ cd ${WRKSRC}/src/include && ${SETENV} ${MAKE_ENV} ${MAKE_CMD} ${MAKE_ARGS} install-client
+.  endif
+.  if ("${PG_SUFFIX}" != "")
 	for binfile in ${STAGEDIR}${PREFIX}/bin/*; do \
 		if [ -r $${binfile} -o -L $${binfile} ]; then \
 			${MV} $${binfile} $${binfile}${PG_SUFFIX} ;\
@@ -341,14 +350,15 @@ do-install:
 	done
 .  endif
 .  if defined(SERVER_ONLY)
+	@ cd ${WRKSRC}/src/include && ${SETENV} ${MAKE_ENV} ${MAKE_CMD} ${MAKE_ARGS} install-server
 	@ ${MKDIR} ${STAGEDIR}${PREFIX}/etc/periodic/daily ;\
 	${INSTALL_SCRIPT} ${WRKDIR}/502.postgresql${PG_SUFFIX} \
 			${STAGEDIR}${PREFIX}/etc/periodic/daily
 	${RLN} ${STAGEDIR}${PREFIX}/bin/postgres${PG_SUFFIX} \
 			${STAGEDIR}${PREFIX}/bin/postmaster${PG_SUFFIX}
 .  endif # SERVER_ONLY
-	for binfile in ${STAGEDIR}${PREFIX}/lib/postgresql${PG_SUFFIX}/*.so; do \
-		if [ -x $${binfile} ]; then ${STRIP_CMD} $${binfile}; fi \
+	for libfile in ${STAGEDIR}${PREFIX}/${PG_LIB_DIR}/*.so; do \
+		if [ -x $${libfile} ]; then ${STRIP_CMD} $${libfile}; fi ;\
 	done
 	@ if [ -r ${PKGMESSAGE} ]; then \
 		${MKDIR} ${STAGEDIR}${DOCSDIR} ;\
